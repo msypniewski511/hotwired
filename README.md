@@ -1,4 +1,5 @@
 # Rails StimulusReflex + Tailwind Template
+# IT DOSENT WORK DONE BY 0
 
 A modern Ruby on Rails 7+ starter template preconfigured with:
 
