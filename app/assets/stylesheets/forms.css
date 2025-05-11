@@ -31,3 +31,6 @@
 .form-group input[type='file']::file-selector-button {
   @apply btn bg-white border border-blue-500 text-blue-700 hover:bg-blue-700 hover:text-white focus:ring-blue-700 outline-none text-sm shadow-none;
 }
+.ql-editor {
+  @apply text-gray-800 leading-relaxed;
+}

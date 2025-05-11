@@ -12,49 +12,75 @@ class JobsController < ApplicationController
   end
 
   # GET /jobs/new
+  # def new
+  #   html = render_to_string(partial: 'form', locals: { job: Job.new })
+  #   render operations: cable_car
+  #     .inner_html('#slideover-content', html: html)
+  #     .text_content('#slideover-header', text: 'Post a new job')
+  # end
+
   def new
-    html = render_to_string(partial: 'form', locals: { job: Job.new })
-    render operations: cable_car
-      .inner_html('#slideover-content', html: html)
-      .text_content('#slideover-header', text: 'Post a new job')
+    @job = Job.new
   end
 
   # GET /jobs/1/edit
   def edit
+    html = render_to_string(partial: 'form', locals: { job: @job })
+    render operations: cable_car
+      .inner_html('#slideover-content', html: html)
+      .text_content('#slideover-header', text: 'Update job')
   end
+
+  # def create
+  #   @job = Job.new(job_params)
+  #   @job.account = current_user.account
+  #   if @job.save
+  #     html = render_to_string(partial: 'job', locals: { job: @job })
+  #     render operations: cable_car
+  #       .prepend('#jobs', html: html)
+  #       .dispatch_event(name: 'submit:success')
+  #   else
+  #     html = render_to_string(partial: 'form', locals: { job: @job })
+  #     render operations: cable_car
+  #       .inner_html('#job-form', html: html), status: :unprocessable_entity
+  #   end
+  # end
 
   def create
     @job = Job.new(job_params)
     @job.account = current_user.account
-  
     if @job.save
-      redirect_to @job, notice: "Job was successfully created."
+      render turbo_stream: turbo_stream.prepend(
+        'jobs',
+        partial: 'job',
+        locals: { job: @job }
+      )
     else
-      render :new, status: :unprocessable_entity
+      render turbo_stream: turbo_stream.replace(
+        'job-form',
+        partial: 'form',
+        locals: { job: @job }
+      ), status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /jobs/1 or /jobs/1.json
   def update
-    respond_to do |format|
-      if @job.update(job_params)
-        format.html { redirect_to @job, notice: "Job was successfully updated." }
-        format.json { render :show, status: :ok, location: @job }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @job.errors, status: :unprocessable_entity }
-      end
+    if @job.update(job_params)
+      html = render_to_string(partial: 'job', locals: { job: @job })
+      render operations: cable_car
+        .replace(dom_id(@job), html: html)
+        .dispatch_event(name: 'submit:success')
+    else
+      html = render_to_string(partial: 'form', locals: { job: @job })
+      render operations: cable_car
+        .inner_html('#job-form', html: html), status: :unprocessable_entity
     end
   end
 
-  # DELETE /jobs/1 or /jobs/1.json
   def destroy
-    @job.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to jobs_path, status: :see_other, notice: "Job was successfully destroyed." }
-      format.json { head :no_content }
-    end
+    @job.destroy
+    # render operations: cable_car.remove(selector: dom_id(@job))
+    render turbo_stream: turbo_stream.remove(@job)
   end
 
   private
@@ -65,6 +91,6 @@ class JobsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def job_params
-      params.require(:job).permit(:title, :status, :job_type, :location, :account_id)
+      params.require(:job).permit(:title, :status, :job_type, :location, :account_id, :description)
     end
 end

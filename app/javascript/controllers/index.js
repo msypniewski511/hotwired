@@ -16,5 +16,8 @@ application.register("counter", CounterController)
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 
+import QuillController from "./quill_controller"
+application.register("quill", QuillController)
+
 import SlideoverController from "./slideover_controller"
 application.register("slideover", SlideoverController)

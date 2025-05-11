@@ -18,7 +18,7 @@ gem "puma", ">= 5.0"
 gem "jsbundling-rails"
 
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
-gem "turbo-rails"
+# gem "turbo-rails"
 
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
@@ -72,3 +72,5 @@ gem "devise", "~> 4.9"
 
 
 gem "inline_svg", "~> 1.10"
+
+gem "turbo-rails", "~> 2.0"
